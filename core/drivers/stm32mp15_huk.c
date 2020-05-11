@@ -20,22 +20,23 @@ static bool stm32mp15_huk_init;
 static TEE_Result stm32mp15_read_uid(uint32_t *uid)
 {
 	uint32_t *q = uid;
+	uint32_t uid_otp = 0;
+	TEE_Result res = TEE_ERROR_GENERIC;
+	int uid_word;
 
-	/*
-	 * Shadow memory for UID words might not be locked: to guarante that
-	 * the final values are read we must lock them.
-	 */
-	if (stm32_bsec_set_sw_lock(UID0_OTP) ||
-	    stm32_bsec_shadow_read_otp(q++, UID0_OTP))
-		return TEE_ERROR_GENERIC;
+	res = stm32_bsec_find_otp_in_nvmem_layout(UID_OTP, &uid_otp, NULL);
+	if (res)
+		panic("UID OTP not found");
 
-	if (stm32_bsec_set_sw_lock(UID1_OTP) ||
-	    stm32_bsec_shadow_read_otp(q++, UID1_OTP))
-		return TEE_ERROR_GENERIC;
-
-	if (stm32_bsec_set_sw_lock(UID2_OTP) ||
-	    stm32_bsec_shadow_read_otp(q++, UID2_OTP))
-		return TEE_ERROR_GENERIC;
+	for (uid_word = 0; uid_word < 3; uid_word++) {
+		/*
+		 * Shadow memory for UID words might not be locked: to guarantee that
+		 * the final values are read we must lock them.
+		 */
+		if (stm32_bsec_set_sw_lock(uid_otp + uid_word) ||
+		    stm32_bsec_shadow_read_otp(&q[uid_word], uid_otp + uid_word))
+			return TEE_ERROR_GENERIC;
+	}
 
 	return TEE_SUCCESS;
 }
