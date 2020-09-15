@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 /*
- * Copyright (c) 2015-2019, Arm Limited and Contributors. All rights reserved.
  * Copyright (c) 2019, Linaro Limited
+ * Copyright (c) 2015-2020, Arm Limited and Contributors. All rights reserved.
  */
 #include <assert.h>
 #include <confine_array_index.h>
