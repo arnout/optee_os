@@ -37,7 +37,7 @@ bool stpmic1_is_regulator_enabled(const char *name);
  * @levels: output reference for an arrays of the supported levels, or NULL
  * @levels_count: output reference for number of supported levels, or NULL
  */
-void stpmic1_regulator_levels_mv(const char *name, const uint16_t **levels,
+TEE_Result stpmic1_regulator_levels_mv(const char *name, const uint16_t **levels,
 				 size_t *levels_count);
 
 /*
