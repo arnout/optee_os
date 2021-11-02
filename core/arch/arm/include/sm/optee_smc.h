@@ -317,6 +317,8 @@
 #define OPTEE_SMC_SEC_CAP_ASYNC_NOTIF		BIT(5)
 /* Secure world supports pre-allocating RPC arg struct */
 #define OPTEE_SMC_SEC_CAP_RPC_ARG		BIT(6)
+/* Secure world is built with OCALL support */
+#define OPTEE_SMC_SEC_CAP_OCALL			BIT(31)
 
 #define OPTEE_SMC_FUNCID_EXCHANGE_CAPABILITIES	U(9)
 #define OPTEE_SMC_EXCHANGE_CAPABILITIES \
