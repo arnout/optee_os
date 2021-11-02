@@ -148,6 +148,12 @@ CFG_TZDRAM_SIZE  ?= 0x02000000
 CFG_TZDRAM_START ?= ($(CFG_DRAM_BASE) + $(CFG_DRAM_SIZE) - $(CFG_TZDRAM_SIZE))
 endif #CFG_STM32MP15
 
+# Enable BSEC Pseudo TA for fuses access management
+CFG_BSEC_PTA ?= y
+ifeq ($(CFG_BSEC_PTA),y)
+$(call force,CFG_STM32_BSEC,y,Mandated by CFG_BSEC_PTA)
+endif
+
 CFG_STM32_BSEC ?= y
 CFG_STM32_CRYP ?= y
 CFG_STM32_ETZPC ?= y
@@ -180,7 +186,7 @@ CFG_WDT ?= $(CFG_STM32_IWDG)
 CFG_STM32MP_PANIC_ON_TZC_PERM_VIOLATION ?= y
 
 # SiP/OEM service for non-secure world
-CFG_STM32_BSEC_SIP ?= y
+CFG_STM32_BSEC_SIP ?= n
 CFG_STM32MP1_SCMI_SIP ?= n
 ifeq ($(CFG_STM32MP1_SCMI_SIP),y)
 $(call force,CFG_SCMI_MSG_DRIVERS,y,Mandated by CFG_STM32MP1_SCMI_SIP)
