@@ -381,13 +381,13 @@ int32_t plat_scmi_clock_set_state(unsigned int channel_id, unsigned int scmi_id,
 
 	if (enable_not_disable) {
 		if (!clock->enabled) {
-			DMSG("SCMI clock %u enable", scmi_id);
+			FMSG("SCMI clock %u enable", scmi_id);
 			clk_enable(clock->clk);
 			clock->enabled = true;
 		}
 	} else {
 		if (clock->enabled) {
-			DMSG("SCMI clock %u disable", scmi_id);
+			FMSG("SCMI clock %u disable", scmi_id);
 			clk_disable(clock->clk);
 			clock->enabled = false;
 		}
@@ -459,7 +459,7 @@ int32_t plat_scmi_rd_autonomous(unsigned int channel_id, unsigned int scmi_id,
 	if (state)
 		return SCMI_NOT_SUPPORTED;
 
-	DMSG("SCMI reset %u cycle", scmi_id);
+	FMSG("SCMI reset %u cycle", scmi_id);
 
 	if (rstctrl_assert_to(rd->rstctrl, TIMEOUT_US_1MS))
 		return SCMI_HARDWARE_ERROR;
@@ -488,10 +488,10 @@ int32_t plat_scmi_rd_set_state(unsigned int channel_id, unsigned int scmi_id,
 	assert(rd->rstctrl);
 
 	if (assert_not_deassert) {
-		DMSG("SCMI reset %u set", scmi_id);
+		FMSG("SCMI reset %u set", scmi_id);
 		res = rstctrl_assert(rd->rstctrl);
 	} else {
-		DMSG("SCMI reset %u release", scmi_id);
+		FMSG("SCMI reset %u release", scmi_id);
 		res = rstctrl_deassert(rd->rstctrl);
 	}
 
