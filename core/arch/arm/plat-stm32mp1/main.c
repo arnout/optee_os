@@ -587,3 +587,14 @@ bool plat_rpmb_key_is_ready(void)
 	return stm32mp_is_closed_device();
 }
 #endif
+
+static int get_chip_dev_id(uint32_t *dev_id)
+{
+#ifdef CFG_STM32MP13
+	*dev_id = stm32mp_syscfg_get_chip_dev_id();
+#else /* assume CFG_STM32MP15 */
+	if (stm32mp1_dbgmcu_get_chip_dev_id(dev_id) != TEE_SUCCESS)
+		return -1;
+#endif
+	return 0;
+}

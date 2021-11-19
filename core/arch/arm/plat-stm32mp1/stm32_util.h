@@ -30,6 +30,19 @@ void stm32mp_syscfg_disable_io_compensation(void);
 /* Platform util for the RCC drivers */
 vaddr_t stm32_rcc_base(void);
 
+static inline void stm32mp_syscfg_enable_io_comp(void)
+{
+	stm32mp_syscfg_enable_io_compensation();
+}
+
+static inline void stm32mp_syscfg_disable_io_comp(void)
+{
+	stm32mp_syscfg_disable_io_compensation();
+}
+
+/* Get device ID from SYSCFG registers */
+uint32_t stm32mp_syscfg_get_chip_dev_id(void);
+
 /* Platform util for the GIC */
 vaddr_t get_gicd_base(void);
 
