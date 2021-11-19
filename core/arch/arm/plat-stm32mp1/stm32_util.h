@@ -102,6 +102,9 @@ static inline bool stm32mp_nsec_can_access_pmic_regu(const char *name __unused)
 }
 #endif
 
+/* Protect the MCU clock subsytem */
+void stm32mp1_clk_mcuss_protect(bool enable);
+
 #ifdef CFG_STM32MP1_SHARED_RESOURCES
 /* Return true if and only if @reset_id relates to a non-secure peripheral */
 bool stm32mp_nsec_can_access_reset(unsigned int reset_id);
