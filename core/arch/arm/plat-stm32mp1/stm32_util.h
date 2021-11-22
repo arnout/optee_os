@@ -119,6 +119,15 @@ static inline bool stm32mp_nsec_can_access_reset(unsigned int reset_id __unused)
 }
 #endif /* CFG_STM32MP1_SHARED_RESOURCES */
 
+/*
+ * Util for PLL1 settings management based on DT OPP table content.
+ */
+int stm32mp1_clk_compute_all_pll1_settings(uint32_t buck1_voltage);
+void stm32mp1_clk_lp_save_opp_pll1_settings(uint8_t *data, size_t size);
+bool stm32mp1_clk_pll1_settings_are_valid(void);
+int stm32mp1_set_opp_khz(uint32_t freq_khz);
+int stm32mp1_round_opp_khz(uint32_t *freq_khz);
+
 /* Return rstctrl instance related to RCC reset controller DT binding ID */
 struct rstctrl *stm32mp_rcc_reset_id_to_rstctrl(unsigned int binding_id);
 
