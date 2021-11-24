@@ -6,8 +6,12 @@
 #include <config.h>
 #include <drivers/stm32_etzpc.h>
 #include <drivers/stm32_gpio.h>
-#include <drivers/stm32mp1_etzpc.h>
+#include <drivers/stm32mp_dt_bindings.h>
+#ifdef CFG_STM32MP13
+#include <drivers/stm32mp13_rcc.h>
+#else /* assume CFG_STM32MP15 */
 #include <drivers/stm32mp1_rcc.h>
+#endif
 #include <drivers/stm32mp_dt_bindings.h>
 #include <initcall.h>
 #include <io.h>
@@ -721,11 +725,6 @@ static TEE_Result stm32mp1_init_final_shres(void)
 		     shres2str_id(id), id, shres2str_state(*state));
 	}
 
-	if (IS_ENABLED(CFG_STM32_GPIO)) {
-		set_gpio_secure_configuration();
-		register_pm_driver_cb(gpioz_pm, NULL,
-				      "stm32mp1-shared-resources");
-	}
 	check_rcc_secure_configuration();
 
 	return TEE_SUCCESS;
