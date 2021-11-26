@@ -26,7 +26,7 @@
  * Once one starts to get the resource registering state, one cannot register
  * new resources. This ensures resource state cannot change.
  */
-static bool registering_locked;
+static bool registering_locked __unused;
 
 /*
  * Shared peripherals and resources registration
@@ -49,7 +49,8 @@ enum shres_state {
 };
 
 /* Use a byte array to store each resource state */
-static uint8_t shres_state[STM32MP1_SHRES_COUNT] = {
+static uint8_t shres_state[STM32MP1_SHRES_COUNT] __maybe_unused = {
+#ifdef CFG_STM32MP15
 #if !defined(CFG_STM32_IWDG)
 	[STM32MP1_SHRES_IWDG1] = SHRES_NON_SECURE,
 #endif
@@ -86,9 +87,11 @@ static uint8_t shres_state[STM32MP1_SHRES_COUNT] = {
 #if !defined(CFG_STM32_RTC)
 	[STM32MP1_SHRES_RTC] = SHRES_NON_SECURE,
 #endif
+#endif
 };
 
 static const char __maybe_unused *shres2str_id_tbl[STM32MP1_SHRES_COUNT] = {
+#ifdef CFG_STM32MP15
 	[STM32MP1_SHRES_GPIOZ(0)] = "GPIOZ0",
 	[STM32MP1_SHRES_GPIOZ(1)] = "GPIOZ1",
 	[STM32MP1_SHRES_GPIOZ(2)] = "GPIOZ2",
@@ -109,6 +112,7 @@ static const char __maybe_unused *shres2str_id_tbl[STM32MP1_SHRES_COUNT] = {
 	[STM32MP1_SHRES_RTC] = "RTC",
 	[STM32MP1_SHRES_MCU] = "MCU",
 	[STM32MP1_SHRES_PLL3] = "PLL3",
+#endif
 	[STM32MP1_SHRES_MDMA] = "MDMA",
 };
 
@@ -128,6 +132,7 @@ static __maybe_unused const char *shres2str_state(enum shres_state id)
 	return shres2str_state_tbl[id];
 }
 
+#ifdef CFG_STM32MP15
 /* GPIOZ bank pin count depends on SoC variants */
 #ifdef CFG_EMBED_DTB
 /* A light count routine for unpaged context to not depend on DTB support */
@@ -442,6 +447,28 @@ bool stm32mp_gpio_bank_is_secure(unsigned int bank)
 
 	return secure > 0 && secure == get_gpioz_nbpin();
 }
+#else
+void stm32mp_register_secure_periph_iomem(vaddr_t base __maybe_unused)
+{
+}
+
+void stm32mp_register_non_secure_periph_iomem(vaddr_t base __maybe_unused)
+{
+}
+
+bool stm32mp_periph_is_secure(enum stm32mp_shres id __maybe_unused)
+{
+	return true;
+}
+
+void stm32mp_register_non_secure_pinctrl(struct stm32_pinctrl_list *l __unused)
+{
+}
+
+void stm32mp_register_secure_pinctrl(struct stm32_pinctrl_list *list __unused)
+{
+}
+#endif /* CFG_STM32MP15 */
 
 bool stm32mp_nsec_can_access_clock(unsigned long clock_id)
 {
@@ -468,11 +495,44 @@ bool stm32mp_nsec_can_access_clock(unsigned long clock_id)
 		return true;
 
 	switch (clock_id) {
-	case RTCAPB:
-	case CK_MPU:
-	case CK_AXI:
 	case BSEC:
+	case CK_AXI:
+	case CK_CSI:
+	case CK_HSE:
+	case CK_HSE_DIV2:
+	case CK_HSI:
+	case CK_LSE:
+	case CK_LSI:
+	case CK_MPU:
+	case PLL1_P:
+	case PLL1_Q:
+	case PLL1_R:
+	case PLL2_P:
+	case PLL2_Q:
+	case PLL2_R:
+	case PLL3_P:
+	case PLL3_Q:
+	case PLL3_R:
+	case RTCAPB:
+#ifdef CFG_STM32MP13
+	case CK_MLAHB:
+	case CK_PER:
+	case PLL4_P:
+	case PLL4_Q:
+	case PLL4_R:
+	case PCLK1:
+	case PCLK2:
+	case PCLK3:
+	case PCLK4:
+	case PCLK5:
+	case PCLK6:
+	case CK_TIMG1:
+	case CK_TIMG2:
+	case CK_TIMG3:
+	case RTC:
+#endif
 		return true;
+#ifdef CFG_STM32MP15
 	case GPIOZ:
 		return !stm32mp_gpio_bank_is_secure(GPIO_BANK_Z);
 	case SPI6_K:
@@ -508,6 +568,7 @@ bool stm32mp_nsec_can_access_clock(unsigned long clock_id)
 	case CK_MCU:
 		shres_id = STM32MP1_SHRES_MCU;
 		break;
+#endif
 	default:
 		return false;
 	}
@@ -520,6 +581,7 @@ bool stm32mp_nsec_can_access_reset(unsigned int reset_id)
 	enum stm32mp_shres shres_id = STM32MP1_SHRES_COUNT;
 
 	switch (reset_id) {
+#ifdef CFG_STM32MP15
 	case GPIOZ_R:
 		return stm32mp_gpio_bank_is_non_secure(GPIO_BANK_Z);
 	case SPI6_R:
@@ -546,12 +608,13 @@ bool stm32mp_nsec_can_access_reset(unsigned int reset_id)
 	case RNG1_R:
 		shres_id = STM32MP1_SHRES_RNG1;
 		break;
-	case MDMA_R:
-		shres_id = STM32MP1_SHRES_MDMA;
-		break;
 	case MCU_R:
 	case MCU_HOLD_BOOT_R:
 		shres_id = STM32MP1_SHRES_MCU;
+		break;
+#endif
+	case MDMA_R:
+		shres_id = STM32MP1_SHRES_MDMA;
 		break;
 	default:
 		return false;
@@ -560,6 +623,7 @@ bool stm32mp_nsec_can_access_reset(unsigned int reset_id)
 	return !stm32mp_periph_is_secure(shres_id);
 }
 
+#ifdef CFG_STM32MP15
 static bool mckprot_resource(enum stm32mp_shres id)
 {
 	switch (id) {
@@ -703,3 +767,4 @@ static TEE_Result stm32mp1_init_final_shres(void)
 }
 /* Finalize shres after drivers initialization, hence driver_init_late() */
 driver_init_late(stm32mp1_init_final_shres);
+#endif
