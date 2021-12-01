@@ -64,6 +64,10 @@
 	compatible = "st,stm32mp13-rcc", "syscon";
 };
 
+&cpu0 {
+	cpu-supply = <&vddcpu>;
+};
+
 &etzpc {
 	st,decprot = <
 		DECPROT(STM32MP1_ETZPC_ADC1_ID, DECPROT_NS_RW, DECPROT_UNLOCK)
