@@ -265,7 +265,9 @@ CFG_WITH_STATS ?= y
 CFG_WERROR ?= y
 
 # Enable to allow debug
-CFG_STM32_BSEC_WRITE ?= $(CFG_TEE_CORE_DEBUG)
+ifeq ($(CFG_TEE_CORE_DEBUG),y)
+CFG_STM32_BSEC_WRITE ?= y
+endif
 
 # Default disable some support for pager memory size constraint
 ifeq ($(CFG_WITH_PAGER),y)
