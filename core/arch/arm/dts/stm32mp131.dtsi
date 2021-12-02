@@ -430,6 +430,14 @@
 				regulator-max-microvolt = <2500000>;
 				clocks = <&rcc VREF>;
 				status = "disabled";
+			hash: hash@54003000 {
+				compatible = "st,stm32mp13-hash";
+				reg = <0x54003000 0x400>;
+				clocks = <&rcc HASH1>;
+				resets = <&rcc HASH1_R>;
+				status = "disabled";
+			};
+
 			};
 
 			stgen: stgen@5c008000 {

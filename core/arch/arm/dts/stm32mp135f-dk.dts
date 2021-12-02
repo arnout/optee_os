@@ -287,6 +287,14 @@
 	st,protreg = < (TZPROT(8)) >;
 };
 
+&hash {
+	status = "okay";
+};
+
+&pka {
+	status = "okay";
+};
+
 &pwr_irq {
 	pinctrl-names = "default";
 	pinctrl-0 = <&wakeup_pins>;
@@ -448,6 +456,14 @@
 			};
 		};
 	};
+};
+
+&rtc {
+	status = "okay";
+};
+
+&saes {
+	status = "okay";
 };
 
 &scmi_regu {
