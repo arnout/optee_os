@@ -499,6 +499,13 @@ bool plat_rpmb_key_is_ready(void)
 }
 #endif
 
+vaddr_t stm32mp_stgen_base(void)
+{
+	struct io_pa_va base = { .pa = STGEN_BASE };
+
+	return io_pa_or_va(&base, 1);
+}
+
 static int get_chip_dev_id(uint32_t *dev_id)
 {
 #ifdef CFG_STM32MP13

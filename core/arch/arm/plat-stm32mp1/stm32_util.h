@@ -31,6 +31,9 @@ bool stm32mp_supports_second_core(void);
 /* Backup registers and RAM utils */
 vaddr_t stm32mp_bkpreg(unsigned int idx);
 
+/* Platform util for the STGEN driver */
+vaddr_t stm32mp_stgen_base(void);
+
 /*
  * SYSCFG IO compensation.
  * These functions assume non-secure world is suspended.
