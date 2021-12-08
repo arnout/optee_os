@@ -8,6 +8,7 @@
 
 #include <dt-bindings/clock/stm32mp13-clksrc.h>
 #include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/gpio/stm32mp_gpio.h>
 #include <dt-bindings/soc/stm32mp13-etzpc.h>
 #include "stm32mp135.dtsi"
 #include "stm32mp13xf.dtsi"
@@ -57,6 +58,12 @@
 		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
 		regulator-always-on;
+	};
+
+	stpmic1_irq: stpmic1-irq {
+		compatible = "st,stpmic1-irq";
+		st,wakeup-pin-number = <1>;
+		status = "okay";
 	};
 };
 
@@ -276,6 +283,10 @@
 	};
 };
 
+&gpiof {
+	st,protreg = < (TZPROT(8)) >;
+};
+
 &pwr_regulators {
 	vdd-supply = <&vdd>;
 	vdd_3v3_usbfs-supply = <&vdd_usb>;
@@ -485,4 +496,8 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&uart8_pins_a>;
 	status = "disabled";
+};
+
+&wakeup_pin_1 {
+	bias-pull-up;
 };
