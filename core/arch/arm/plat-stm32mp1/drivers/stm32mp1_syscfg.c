@@ -72,6 +72,9 @@ void stm32mp_syscfg_enable_io_compensation(void)
 	    clk_enable(stm32mp_rcc_clock_id_to_clk(SYSCFG)))
 		panic();
 
+	if (io_read32(syscfg_base + SYSCFG_CMPCR) & SYSCFG_CMPCR_READY)
+		return;
+
 	io_setbits32(syscfg_base + SYSCFG_CMPENSETR, SYSCFG_CMPENSETR_MPU_EN);
 
 	timeout_ref = timeout_init_us(SYSCFG_CMPCR_READY_TIMEOUT_US);
@@ -92,23 +95,29 @@ void stm32mp_syscfg_disable_io_compensation(void)
 {
 	vaddr_t syscfg_base = get_syscfg_base();
 	struct clk *syscfg_clk = stm32mp_rcc_clock_id_to_clk(SYSCFG);
-	uint32_t value = 0;
+	uint32_t value_cmpcr = 0;
+	uint32_t value_cmpcr2 = 0;
 
 	assert(syscfg_clk);
 	/* No refcount balance needed on non-secure SYSCFG clock */
 	clk_enable(syscfg_clk);
 
+	value_cmpcr = io_read32(syscfg_base + SYSCFG_CMPCR);
+	value_cmpcr2 = io_read32(syscfg_base + SYSCFG_CMPENSETR);
+	if (!(value_cmpcr & SYSCFG_CMPCR_READY &&
+	      value_cmpcr2 & SYSCFG_CMPENSETR_MPU_EN))
+		return;
 
-	value = io_read32(syscfg_base + SYSCFG_CMPCR) >>
+	value_cmpcr = io_read32(syscfg_base + SYSCFG_CMPCR) >>
 		SYSCFG_CMPCR_ANSRC_SHIFT;
 
 	io_clrbits32(syscfg_base + SYSCFG_CMPCR,
 		     SYSCFG_CMPCR_RANSRC | SYSCFG_CMPCR_RAPSRC);
 
-	value = io_read32(syscfg_base + SYSCFG_CMPCR) |
-		(value << SYSCFG_CMPCR_RANSRC_SHIFT);
+	value_cmpcr <<= SYSCFG_CMPCR_RANSRC_SHIFT;
+	value_cmpcr |= io_read32(syscfg_base + SYSCFG_CMPCR);
 
-	io_write32(syscfg_base + SYSCFG_CMPCR, value | SYSCFG_CMPCR_SW_CTRL);
+	io_write32(syscfg_base + SYSCFG_CMPCR, value_cmpcr | SYSCFG_CMPCR_SW_CTRL);
 
 	DMSG("SYSCFG.cmpcr = %#"PRIx32, io_read32(syscfg_base + SYSCFG_CMPCR));
 
