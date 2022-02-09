@@ -65,11 +65,9 @@ endif
 
 include core/arch/arm/cpu/cortex-a7.mk
 
-$(call force,CFG_DRIVERS_CLK,y)
 $(call force,CFG_GIC,y)
 $(call force,CFG_INIT_CNTVOFF,y)
 $(call force,CFG_PSCI_ARM32,y)
-$(call force,CFG_REGULATOR_DRIVERS,y)
 $(call force,CFG_SECURE_TIME_SOURCE_CNTPCT,y)
 $(call force,CFG_SM_PLATFORM_HANDLER,y)
 $(call force,CFG_STM32_SHARED_IO,y)
@@ -77,7 +75,10 @@ $(call force,CFG_STM32_SHARED_IO,y)
 ifeq ($(CFG_STM32MP13),y)
 $(call force,CFG_BOOT_SECONDARY_REQUEST,n)
 $(call force,CFG_CORE_RESERVED_SHM,n)
+$(call force,CFG_DRIVERS_CLK,y)
 $(call force,CFG_DRIVERS_CLK_FIXED,y)
+$(call force,CFG_RPROC_PTA,n)
+$(call force,CFG_REGULATOR_DRIVERS,y)
 $(call force,CFG_SECONDARY_INIT_CNTFRQ,n)
 $(call force,CFG_STM32_GPIO,y)
 $(call force,CFG_STM32_EXTI,y)
@@ -93,7 +94,9 @@ endif # CFG_STM32MP13
 
 ifeq ($(CFG_STM32MP15),y)
 $(call force,CFG_BOOT_SECONDARY_REQUEST,y)
+$(call force,CFG_DRIVERS_CLK,y)
 $(call force,CFG_DRIVERS_CLK_FIXED,n)
+$(call force,CFG_REGULATOR_DRIVERS,y)
 $(call force,CFG_SECONDARY_INIT_CNTFRQ,y)
 $(call force,CFG_STM32_VREFBUF,n)
 $(call force,CFG_STM32MP1_SHARED_RESOURCES,y)
@@ -118,6 +121,7 @@ CFG_CORE_HEAP_SIZE ?= 49152
 # side effect on TEE session release by the Linux tee & optee drivers.
 CFG_PREALLOC_RPC_CACHE ?= n
 
+
 ifeq ($(CFG_EMBED_DTB_SOURCE_FILE),)
 # Some drivers mandate DT support
 $(call force,CFG_DRIVERS_CLK_DT,n)
@@ -126,8 +130,9 @@ $(call force,CFG_STM32_CRYP,n)
 $(call force,CFG_STM32_GPIO,n)
 $(call force,CFG_STM32_I2C,n)
 $(call force,CFG_STM32_IWDG,n)
-$(call force,CFG_STM32_TAMP,n)
+$(call force,CFG_STM32_LPTIMER,n)
 $(call force,CFG_STM32_REGULATOR_GPIO,n)
+$(call force,CFG_STM32_TAMP,n)
 $(call force,CFG_STM32_VREFBUF,y)
 $(call force,CFG_STPMIC1,n)
 $(call force,CFG_STM32MP1_SCMI_SIP,n)
@@ -183,9 +188,11 @@ CFG_STM32_ETZPC ?= y
 CFG_STM32_GPIO ?= y
 CFG_STM32_I2C ?= y
 CFG_STM32_IWDG ?= y
+CFG_STM32_PKA ?= y
 CFG_STM32_REGULATOR_GPIO ?= y
 CFG_STM32_RNG ?= y
 CFG_STM32_RSTCTRL ?= y
+CFG_STM32_SAES ?= y
 CFG_STM32_TAMP ?= y
 CFG_STM32_UART ?= y
 CFG_STM32_VREFBUF ?= y
@@ -215,8 +222,8 @@ CFG_WDT ?= $(CFG_STM32_IWDG)
 # Platform specific configuration
 CFG_STM32MP_PANIC_ON_TZC_PERM_VIOLATION ?= y
 
-CFG_STM32MP1_SCMI_SIP ?= n
 CFG_STM32_PWR_SIP ?= y
+CFG_STM32MP1_SCMI_SIP ?= n
 ifeq ($(CFG_STM32MP1_SCMI_SIP),y)
 $(call force,CFG_SCMI_MSG_DRIVERS,y,Mandated by CFG_STM32MP1_SCMI_SIP)
 $(call force,CFG_SCMI_MSG_SMT,y,Mandated by CFG_STM32MP1_SCMI_SIP)
