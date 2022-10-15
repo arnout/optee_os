@@ -636,7 +636,8 @@ static void check_rcc_secure_configuration(void)
 	bool have_error = false;
 
 	if (stm32mp_is_closed_device() && !secure)
-		panic();
+		IMSG(">> %s: ignore RCC is not secure", __func__);
+		// panic();
 
 	for (id = 0; id < STM32MP1_SHRES_COUNT; id++) {
 		if  (shres_state[id] != SHRES_SECURE)
