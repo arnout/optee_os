@@ -172,8 +172,10 @@ sss_status_t se050_enable_scp03(sss_se05x_session_t *session)
 
 	return kStatus_SSS_Fail;
 out:
+	/* Don't return an error here in case HUK was not ready, etc. */
 	if (IS_ENABLED(CFG_CORE_SE05X_SCP03_PROVISION_ON_INIT))
-		return se050_rotate_scp03_keys(&se050_ctx);
+		if (se050_rotate_scp03_keys(&se050_ctx) != kStatus_SSS_Success)
+			IMSG("WARNING: scp03 key rotation attempt failed.  Skipping.");
 
 	return kStatus_SSS_Success;
 }
