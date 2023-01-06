@@ -815,10 +815,6 @@ int stm32_i2c_init(struct i2c_handle_s *hi2c,
 	if (rc)
 		DMSG("I2C analog filter error %d", rc);
 
-	if (IS_ENABLED(CFG_STM32MP13))
-		stm32_gpio_set_secure_cfg(hi2c->pinctrl->bank,
-					  hi2c->pinctrl->pin, true);
-
 	clk_disable(hi2c->clock);
 
 	return rc;
@@ -1516,10 +1512,6 @@ void stm32_i2c_resume(struct i2c_handle_s *hi2c)
 	}
 
 	restore_cfg(hi2c, &hi2c->sec_cfg);
-
-	if (IS_ENABLED(CFG_STM32MP13))
-		stm32_gpio_set_secure_cfg(hi2c->pinctrl->bank,
-					  hi2c->pinctrl->pin, true);
 
 	hi2c->i2c_state = I2C_STATE_READY;
 }
