@@ -13,6 +13,15 @@
 			bias-disable;
 			drive-open-drain;
 			slew-rate = <0>;
+	rcc_mco_pins_a: rcc-pins-0 {
+		pins {
+			pinmux = <STM32_PINMUX('D', 7, AF0)>; /* RCC_MCO_1 */
+			bias-disable;
+			drive-push-pull;
+			slew-rate = <1>;
+		};
+	};
+
 		};
 	};
 
